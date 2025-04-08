@@ -1,6 +1,6 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { LoaderFunction, LoaderFunctionArgs, ActionFunction } from '@remix-run/node';
-import { useLoaderData, Link, redirect, Form } from '@remix-run/react';
+import { useLoaderData, useActionData, Link, redirect, Form } from '@remix-run/react';
 import { CampaignDetails, getCampaignWithKeywords, addKeyword, deleteKeyword } from '../lib/data.server';
 
 export const loader: LoaderFunction = async ({ params }: LoaderFunctionArgs) => {
@@ -19,9 +19,19 @@ export const action: ActionFunction = async ({ request, params }) => {
 
     try {
         if (actionType === 'addKeyword') {
+            const text = String(form.get('text'));
+            const campaign_id = Number(form.get('campaign_id'));
+
+            const campaign = await getCampaignWithKeywords(campaign_id);
+            const keywordExists = campaign.keywords.some((k) => k.text.toLowerCase() === text.toLowerCase());
+
+            if (keywordExists) {
+                return { error: 'Keyword already exists!' };
+            }
+
             await addKeyword({
-                campaign_id: Number(form.get('campaign_id')),
-                text: String(form.get('text')),
+                campaign_id,
+                text,
                 bid: parseFloat(String(form.get('bid'))),
                 match_type: String(form.get('match_type')) as any,
                 state: String(form.get('state')) as any,
@@ -39,12 +49,19 @@ export const action: ActionFunction = async ({ request, params }) => {
 export default function CampaignDetailsPage() {
     const [open, setOpen] = useState(false);
     const [showIdFirst, setShowIdFirst] = useState(true);
+    const actionData = useActionData<{ error?: string }>();
 
     const headers = showIdFirst ? ['ID', 'Text'] : ['Text', 'ID'];
     const accessors = showIdFirst ? ['id', 'text'] : ['text', 'id'];
 
     const campaignDetails: CampaignDetails = useLoaderData();
     const { keywords } = campaignDetails;
+
+    useEffect(() => {
+        if (actionData?.error) {
+            alert(actionData.error);
+        }
+    }, [actionData]);
 
     return (
         <>
@@ -164,7 +181,7 @@ export default function CampaignDetailsPage() {
                         <p>No keyword found! Try adding keywords...</p>
                     )}
 
-                    <Link className='mt-5' to='/'>
+                    <Link className='mt-5 underline' to='/'>
                         Back to all campaigns
                     </Link>
                 </div>

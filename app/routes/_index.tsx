@@ -1,6 +1,6 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { LoaderFunction, ActionFunction } from '@remix-run/node';
-import { useLoaderData, redirect, Form, useNavigate } from '@remix-run/react';
+import { useLoaderData, useActionData, redirect, Form, useNavigate } from '@remix-run/react';
 import { Campaign, getCampaigns, addCampaign, deleteCampaign } from '../lib/data.server';
 
 export const loader: LoaderFunction = async () => {
@@ -14,10 +14,17 @@ export const action: ActionFunction = async ({ request }) => {
 
     try {
         if (actionType === 'addCampaign') {
-            await addCampaign({
-                name: String(form.get('name')),
-                daily_budget: parseFloat(String(form.get('daily_budget'))),
-            });
+            const name = String(form.get('name'));
+            const daily_budget = parseFloat(String(form.get('daily_budget')));
+
+            const campaigns = await getCampaigns();
+            const nameExists = campaigns.some((c) => c.name.toLowerCase() === name.toLowerCase());
+
+            if (nameExists) {
+                return { error: 'Campaign name already exists!' };
+            }
+
+            await addCampaign({ name, daily_budget });
         } else if (actionType === 'deleteCampaign') {
             await deleteCampaign(Number(form.get('campaign_id')));
         }
@@ -32,11 +39,18 @@ export default function Index() {
     const [open, setOpen] = useState(false);
     const [showIdFirst, setShowIdFirst] = useState(true);
     const navigate = useNavigate();
+    const actionData = useActionData<{ error?: string }>();
 
     const headers = showIdFirst ? ['ID', 'Name'] : ['Name', 'ID'];
     const accessors = showIdFirst ? ['id', 'name'] : ['name', 'id'];
 
     const campaigns: Campaign[] = useLoaderData();
+
+    useEffect(() => {
+        if (actionData?.error) {
+            alert(actionData.error);
+        }
+    }, [actionData]);
 
     return (
         <>

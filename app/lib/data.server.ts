@@ -85,13 +85,18 @@ export async function deleteKeyword(id: number): Promise<void> {
     await fs.writeFile(keywordsPath, JSON.stringify(updatedKeywords, null, 2));
 }
 
-export async function getCampaignWithKeywords(campaignId: number): Promise<CampaignDetails | object> {
+export async function getCampaignWithKeywords(campaignId: number): Promise<CampaignDetails> {
     const campaigns = await getCampaigns();
     const keywords = await getKeywords();
     const campaign = campaigns.find((c) => c.id === campaignId);
-    const relatedKeywords = keywords.filter((k) => k.campaign_id === campaignId);
-    return {
-        ...campaign,
-        keywords: relatedKeywords,
-    };
+
+    if (campaign) {
+        const relatedKeywords = keywords.filter((k) => k.campaign_id === campaignId);
+        return {
+            ...campaign,
+            keywords: relatedKeywords,
+        };
+    } else {
+        throw Error('Campaign does not exist!');
+    }
 }
