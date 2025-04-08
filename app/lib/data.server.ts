@@ -1,8 +1,8 @@
 import fs from 'fs/promises';
 import path from 'path';
 
-const campaignsPath = path.join(process.cwd(), 'data', 'campaigns.json');
-const keywordsPath = path.join(process.cwd(), 'data', 'keywords.json');
+const CAMPAIGNS_PATH = path.join(process.cwd(), 'data', 'campaigns.json');
+const KEYWORDS_PATH = path.join(process.cwd(), 'data', 'keywords.json');
 
 export type Campaign = {
     id: number;
@@ -27,7 +27,7 @@ export type CampaignDetails = {
 };
 
 export async function getCampaigns(): Promise<Campaign[]> {
-    const data = await fs.readFile(campaignsPath, 'utf-8');
+    const data = await fs.readFile(CAMPAIGNS_PATH, 'utf-8');
     return JSON.parse(data);
 }
 
@@ -42,8 +42,21 @@ export async function addCampaign(campaign: Omit<Campaign, 'id'>): Promise<Campa
     }
 
     campaigns.push(newCampaign);
-    await fs.writeFile(campaignsPath, JSON.stringify(campaigns, null, 2));
+    await fs.writeFile(CAMPAIGNS_PATH, JSON.stringify(campaigns, null, 2));
     return newCampaign;
+}
+
+export async function editCampaign(updated: Campaign): Promise<void> {
+    const campaigns = await getCampaigns();
+
+    const index = campaigns.findIndex((c) => c.id === updated.id);
+    if (index === -1) {
+        throw new Error('Campaign not found');
+    }
+
+    campaigns[index] = { ...campaigns[index], ...updated };
+
+    await fs.writeFile(CAMPAIGNS_PATH, JSON.stringify(campaigns, null, 2), 'utf-8');
 }
 
 export async function deleteCampaign(id: number): Promise<void> {
@@ -53,12 +66,12 @@ export async function deleteCampaign(id: number): Promise<void> {
     const updatedCampaigns = campaigns.filter((c) => c.id !== id);
     const updatedKeywords = keywords.filter((k) => k.campaign_id !== id);
 
-    await fs.writeFile(campaignsPath, JSON.stringify(updatedCampaigns, null, 2));
-    await fs.writeFile(keywordsPath, JSON.stringify(updatedKeywords, null, 2));
+    await fs.writeFile(CAMPAIGNS_PATH, JSON.stringify(updatedCampaigns, null, 2));
+    await fs.writeFile(KEYWORDS_PATH, JSON.stringify(updatedKeywords, null, 2));
 }
 
 export async function getKeywords(): Promise<Keyword[]> {
-    const data = await fs.readFile(keywordsPath, 'utf-8');
+    const data = await fs.readFile(KEYWORDS_PATH, 'utf-8');
     return JSON.parse(data);
 }
 
@@ -74,7 +87,7 @@ export async function addKeyword(keyword: Omit<Keyword, 'id'>): Promise<Keyword>
     const newKeyword: Keyword = { id: newId, ...keyword };
     keywords.push(newKeyword);
 
-    await fs.writeFile(keywordsPath, JSON.stringify(keywords, null, 2));
+    await fs.writeFile(KEYWORDS_PATH, JSON.stringify(keywords, null, 2));
     return newKeyword;
 }
 
@@ -82,7 +95,7 @@ export async function deleteKeyword(id: number): Promise<void> {
     const keywords = await getKeywords();
     const updatedKeywords = keywords.filter((k) => k.id !== id);
 
-    await fs.writeFile(keywordsPath, JSON.stringify(updatedKeywords, null, 2));
+    await fs.writeFile(KEYWORDS_PATH, JSON.stringify(updatedKeywords, null, 2));
 }
 
 export async function getCampaignWithKeywords(campaignId: number): Promise<CampaignDetails> {

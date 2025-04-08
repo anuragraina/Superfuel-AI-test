@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { LoaderFunction, ActionFunction } from '@remix-run/node';
 import { useLoaderData, useActionData, redirect, Form, useNavigate } from '@remix-run/react';
-import { Campaign, getCampaigns, addCampaign, deleteCampaign } from '../lib/data.server';
+import { Campaign, getCampaigns, addCampaign, editCampaign, deleteCampaign } from '../lib/data.server';
 
 export const loader: LoaderFunction = async () => {
     const campaigns = await getCampaigns();
@@ -25,6 +25,19 @@ export const action: ActionFunction = async ({ request }) => {
             }
 
             await addCampaign({ name, daily_budget });
+        } else if (actionType === 'editCampaign') {
+            const id = Number(form.get('campaign_id'));
+            const name = String(form.get('name'));
+            const daily_budget = parseFloat(String(form.get('daily_budget')));
+
+            const campaigns = await getCampaigns();
+            const duplicate = campaigns.some((c) => c.id !== id && c.name.toLowerCase() === name.toLowerCase());
+
+            if (duplicate) {
+                return { error: 'Campaign name already exists!' };
+            }
+
+            await editCampaign({ id, name, daily_budget });
         } else if (actionType === 'deleteCampaign') {
             await deleteCampaign(Number(form.get('campaign_id')));
         }
@@ -36,7 +49,7 @@ export const action: ActionFunction = async ({ request }) => {
 };
 
 export default function Index() {
-    const [open, setOpen] = useState(false);
+    const [openCampaign, setOpenCampaign] = useState<'new' | Campaign | null>(null);
     const [showIdFirst, setShowIdFirst] = useState(true);
     const navigate = useNavigate();
     const actionData = useActionData<{ error?: string }>();
@@ -55,23 +68,33 @@ export default function Index() {
     return (
         <>
             {/* Modal */}
-            {open && (
+            {openCampaign && (
                 <div className='fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-50'>
                     <div className='bg-white p-6 rounded-lg shadow-xl w-full max-w-md'>
                         <div className='flex justify-between items-center mb-4'>
-                            <h2 className='text-xl font-semibold'>New Campaign</h2>
-                            <button onClick={() => setOpen(false)} className='text-gray-500 hover:text-black'>
+                            <h2 className='text-xl font-semibold'>
+                                {openCampaign === 'new' ? 'New Campaign' : 'Edit Campaign'}
+                            </h2>
+                            <button onClick={() => setOpenCampaign(null)} className='text-gray-500 hover:text-black'>
                                 &times;
                             </button>
                         </div>
 
-                        <Form method='post' className='space-y-3' onSubmit={() => setOpen(false)}>
-                            <input type='hidden' name='_action' value='addCampaign' />
+                        <Form method='post' className='space-y-3' onSubmit={() => setOpenCampaign(null)}>
+                            <input
+                                type='hidden'
+                                name='_action'
+                                value={openCampaign === 'new' ? 'addCampaign' : 'editCampaign'}
+                            />
+                            {openCampaign !== 'new' && (
+                                <input type='hidden' name='campaign_id' value={openCampaign.id} />
+                            )}
 
                             <input
                                 name='name'
                                 placeholder='Campaign Name'
                                 className='border p-2 w-full rounded'
+                                defaultValue={openCampaign === 'new' ? '' : openCampaign.name}
                                 required
                             />
 
@@ -81,19 +104,20 @@ export default function Index() {
                                 step='0.01'
                                 placeholder='Daily Budget'
                                 className='border p-2 w-full rounded'
+                                defaultValue={openCampaign === 'new' ? '' : openCampaign.daily_budget}
                                 required
                             />
 
                             <div className='flex justify-end space-x-2'>
                                 <button
                                     type='button'
-                                    onClick={() => setOpen(false)}
+                                    onClick={() => setOpenCampaign(null)}
                                     className='px-4 py-2 bg-gray-200 rounded'
                                 >
                                     Cancel
                                 </button>
                                 <button type='submit' className='px-4 py-2 bg-green-600 text-white rounded'>
-                                    Create
+                                    {openCampaign === 'new' ? 'Create' : 'Save Changes'}
                                 </button>
                             </div>
                         </Form>
@@ -105,7 +129,10 @@ export default function Index() {
                 <div className='flex flex-col w-1/2'>
                     <div className='flex items-center justify-between w-100 m-5'>
                         <h1 className='text-2xl font-bold mb-4'>Ad Campaigns</h1>
-                        <button onClick={() => setOpen(true)} className='bg-blue-600 text-white px-3 py-1 rounded'>
+                        <button
+                            onClick={() => setOpenCampaign('new')}
+                            className='bg-blue-600 text-white px-3 py-1 rounded'
+                        >
                             Add campaign
                         </button>
                     </div>
@@ -146,7 +173,15 @@ export default function Index() {
                                                 {(campaign as any)[accessors[1]]}
                                             </td>
                                             <td className='p-2 border text-center space-x-2'>
-                                                <button className='text-blue-600 hover:underline text-sm'>Edit</button>
+                                                <button
+                                                    onClick={(e) => {
+                                                        e.stopPropagation();
+                                                        setOpenCampaign(campaign);
+                                                    }}
+                                                    className='text-blue-600 hover:underline text-sm'
+                                                >
+                                                    Edit
+                                                </button>
 
                                                 <Form method='post' className='inline'>
                                                     <input type='hidden' name='_action' value='deleteCampaign' />
