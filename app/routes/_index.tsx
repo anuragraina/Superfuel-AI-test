@@ -96,50 +96,63 @@ export default function Index() {
                         </button>
                     </div>
 
-                    <div>
-                        <button
-                            onClick={() => setShowIdFirst((prev) => !prev)}
-                            className='text-sm bg-gray-200 px-3 py-1 my-3 rounded'
-                        >
-                            Toggle Column Order
-                        </button>
-                    </div>
-
-                    <table className='border border-gray-300 text-sm '>
-                        <thead className='bg-gray-100'>
-                            <tr>
-                                {headers.map((header) => (
-                                    <th key={header} className='p-2 border'>
-                                        {header}
-                                    </th>
-                                ))}
-                                <th className='p-2 border'>Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {campaigns.map((campaign) => (
-                                <tr
-                                    key={campaign.id}
-                                    className='border-t hover:bg-gray-50 cursor-pointer'
-                                    onClick={() => navigate(`/campaign/${campaign.id}`)}
+                    {campaigns && campaigns.length > 0 ? (
+                        <>
+                            <div>
+                                <button
+                                    onClick={() => setShowIdFirst((prev) => !prev)}
+                                    className='text-sm bg-gray-200 px-3 py-1 my-3 rounded'
                                 >
-                                    <td className='p-2 border text-center'>{(campaign as any)[accessors[0]]}</td>
-                                    <td className='p-2 border text-center'>{(campaign as any)[accessors[1]]}</td>
-                                    <td className='p-2 border text-center space-x-2'>
-                                        <button className='text-blue-600 hover:underline text-sm'>Edit</button>
+                                    Toggle Column Order
+                                </button>
+                            </div>
 
-                                        <Form method='post' className='inline'>
-                                            <input type='hidden' name='_action' value='deleteCampaign' />
-                                            <input type='hidden' name='campaign_id' value={campaign.id} />
-                                            <button type='submit' className='text-red-600 hover:underline text-sm'>
-                                                Delete
-                                            </button>
-                                        </Form>
-                                    </td>
-                                </tr>
-                            ))}
-                        </tbody>
-                    </table>
+                            <table className='border border-gray-300 text-sm '>
+                                <thead className='bg-gray-100'>
+                                    <tr>
+                                        {headers.map((header) => (
+                                            <th key={header} className='p-2 border'>
+                                                {header}
+                                            </th>
+                                        ))}
+                                        <th className='p-2 border'>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {campaigns.map((campaign) => (
+                                        <tr
+                                            key={campaign.id}
+                                            className='border-t hover:bg-gray-50 cursor-pointer'
+                                            onClick={() => navigate(`/campaign/${campaign.id}`)}
+                                        >
+                                            <td className='p-2 border text-center'>
+                                                {(campaign as any)[accessors[0]]}
+                                            </td>
+                                            <td className='p-2 border text-center'>
+                                                {(campaign as any)[accessors[1]]}
+                                            </td>
+                                            <td className='p-2 border text-center space-x-2'>
+                                                <button className='text-blue-600 hover:underline text-sm'>Edit</button>
+
+                                                <Form method='post' className='inline'>
+                                                    <input type='hidden' name='_action' value='deleteCampaign' />
+                                                    <input type='hidden' name='campaign_id' value={campaign.id} />
+                                                    <button
+                                                        type='submit'
+                                                        className='text-red-600 hover:underline text-sm'
+                                                    >
+                                                        Delete
+                                                    </button>
+                                                </Form>
+                                            </td>
+                                        </tr>
+                                    ))}
+                                </tbody>
+                            </table>
+                        </>
+                    ) : (
+                        <p>No campaign found! Try adding campaigns...</p>
+                    )}
                 </div>
             </div>
         </>

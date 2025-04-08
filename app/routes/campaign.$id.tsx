@@ -116,45 +116,53 @@ export default function CampaignDetailsPage() {
                             Add keyword
                         </button>
                     </div>
+                    {keywords && keywords.length > 0 ? (
+                        <>
+                            <div>
+                                <button
+                                    onClick={() => setShowIdFirst((prev) => !prev)}
+                                    className='text-sm bg-gray-200 px-3 py-1 my-3 rounded'
+                                >
+                                    Toggle Column Order
+                                </button>
+                            </div>
 
-                    <div>
-                        <button
-                            onClick={() => setShowIdFirst((prev) => !prev)}
-                            className='text-sm bg-gray-200 px-3 py-1 my-3 rounded'
-                        >
-                            Toggle Column Order
-                        </button>
-                    </div>
-
-                    <table className='border border-gray-300 text-sm'>
-                        <thead className='bg-gray-100'>
-                            <tr>
-                                {headers.map((header) => (
-                                    <th key={header} className='p-2 border'>
-                                        {header}
-                                    </th>
-                                ))}
-                                <th className='p-2 border'>Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {keywords.map((keyword) => (
-                                <tr key={keyword.id} className='border-t hover:bg-gray-50'>
-                                    <td className='p-2 border text-center'>{(keyword as any)[accessors[0]]}</td>
-                                    <td className='p-2 border text-center'>{(keyword as any)[accessors[1]]}</td>
-                                    <td className='p-2 border space-x-2 text-center'>
-                                        <Form method='post' className='inline'>
-                                            <input type='hidden' name='_action' value='deleteKeyword' />
-                                            <input type='hidden' name='keyword_id' value={keyword.id} />
-                                            <button type='submit' className='text-red-600 hover:underline text-sm'>
-                                                Delete
-                                            </button>
-                                        </Form>
-                                    </td>
-                                </tr>
-                            ))}
-                        </tbody>
-                    </table>
+                            <table className='border border-gray-300 text-sm'>
+                                <thead className='bg-gray-100'>
+                                    <tr>
+                                        {headers.map((header) => (
+                                            <th key={header} className='p-2 border'>
+                                                {header}
+                                            </th>
+                                        ))}
+                                        <th className='p-2 border'>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {keywords.map((keyword) => (
+                                        <tr key={keyword.id} className='border-t hover:bg-gray-50'>
+                                            <td className='p-2 border text-center'>{(keyword as any)[accessors[0]]}</td>
+                                            <td className='p-2 border text-center'>{(keyword as any)[accessors[1]]}</td>
+                                            <td className='p-2 border space-x-2 text-center'>
+                                                <Form method='post' className='inline'>
+                                                    <input type='hidden' name='_action' value='deleteKeyword' />
+                                                    <input type='hidden' name='keyword_id' value={keyword.id} />
+                                                    <button
+                                                        type='submit'
+                                                        className='text-red-600 hover:underline text-sm'
+                                                    >
+                                                        Delete
+                                                    </button>
+                                                </Form>
+                                            </td>
+                                        </tr>
+                                    ))}
+                                </tbody>
+                            </table>
+                        </>
+                    ) : (
+                        <p>No keyword found! Try adding keywords...</p>
+                    )}
 
                     <Link className='mt-5' to='/'>
                         Back to all campaigns
