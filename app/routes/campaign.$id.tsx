@@ -108,55 +108,58 @@ export default function CampaignDetailsPage() {
                     </div>
                 </div>
             )}
+            <div className='flex h-screen items-center justify-center w-screen'>
+                <div className='flex flex-col border-black w-1/2'>
+                    <div className='flex items-center justify-between'>
+                        <h1 className='text-2xl font-bold mb-4'>{`${campaignDetails.name} - Keywords`}</h1>
+                        <button onClick={() => setOpen(true)} className='bg-blue-600 text-white px-3 py-1 rounded'>
+                            Add keyword
+                        </button>
+                    </div>
 
-            <div className='flex flex-col h-screen items-center justify-center'>
-                <div className='flex items-center justify-between'>
-                    <h1 className='text-2xl font-bold mb-4'>{`${campaignDetails.name} - Keywords`}</h1>
-                    <button onClick={() => setOpen(true)} className='bg-blue-600 text-white px-4 py-2 rounded'>
-                        Add keyword
-                    </button>
-                </div>
+                    <div>
+                        <button
+                            onClick={() => setShowIdFirst((prev) => !prev)}
+                            className='text-sm bg-gray-200 px-3 py-1 my-3 rounded'
+                        >
+                            Toggle Column Order
+                        </button>
+                    </div>
 
-                <div className='flex justify-between items-center'>
-                    <button
-                        onClick={() => setShowIdFirst((prev) => !prev)}
-                        className='text-sm bg-gray-200 px-3 py-1 rounded'
-                    >
-                        Toggle Column Order
-                    </button>
-                </div>
-
-                <table className='min-w-full border border-gray-300 text-sm'>
-                    <thead className='bg-gray-100'>
-                        <tr>
-                            {headers.map((header) => (
-                                <th key={header} className='p-2 border'>
-                                    {header}
-                                </th>
-                            ))}
-                            <th className='p-2 border'>Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {keywords.map((keyword) => (
-                            <tr key={keyword.id} className='border-t hover:bg-gray-50'>
-                                <td className='p-2 border'>{(keyword as any)[accessors[0]]}</td>
-                                <td className='p-2 border'>{(keyword as any)[accessors[1]]}</td>
-                                <td className='p-2 border space-x-2'>
-                                    <Form method='post' className='inline'>
-                                        <input type='hidden' name='_action' value='deleteKeyword' />
-                                        <input type='hidden' name='keyword_id' value={keyword.id} />
-                                        <button type='submit' className='text-red-600 hover:underline text-sm'>
-                                            Delete
-                                        </button>
-                                    </Form>
-                                </td>
+                    <table className='border border-gray-300 text-sm'>
+                        <thead className='bg-gray-100'>
+                            <tr>
+                                {headers.map((header) => (
+                                    <th key={header} className='p-2 border'>
+                                        {header}
+                                    </th>
+                                ))}
+                                <th className='p-2 border'>Actions</th>
                             </tr>
-                        ))}
-                    </tbody>
-                </table>
+                        </thead>
+                        <tbody>
+                            {keywords.map((keyword) => (
+                                <tr key={keyword.id} className='border-t hover:bg-gray-50'>
+                                    <td className='p-2 border text-center'>{(keyword as any)[accessors[0]]}</td>
+                                    <td className='p-2 border text-center'>{(keyword as any)[accessors[1]]}</td>
+                                    <td className='p-2 border space-x-2 text-center'>
+                                        <Form method='post' className='inline'>
+                                            <input type='hidden' name='_action' value='deleteKeyword' />
+                                            <input type='hidden' name='keyword_id' value={keyword.id} />
+                                            <button type='submit' className='text-red-600 hover:underline text-sm'>
+                                                Delete
+                                            </button>
+                                        </Form>
+                                    </td>
+                                </tr>
+                            ))}
+                        </tbody>
+                    </table>
 
-                <Link to='/'>Back to all campaigns</Link>
+                    <Link className='mt-5' to='/'>
+                        Back to all campaigns
+                    </Link>
+                </div>
             </div>
         </>
     );

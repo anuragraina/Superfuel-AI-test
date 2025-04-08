@@ -87,59 +87,60 @@ export default function Index() {
                 </div>
             )}
 
-            <div className='flex flex-col h-screen items-center justify-center'>
-                <div className='flex items-center justify-between'>
-                    <h1 className='text-2xl font-bold mb-4'>Ad Campaigns</h1>
-                    <button onClick={() => setOpen(true)} className='bg-blue-600 text-white px-4 py-2 rounded'>
-                        Add campaign
-                    </button>
-                </div>
+            <div className='flex h-screen items-center justify-center w-screen'>
+                <div className='flex flex-col w-1/2'>
+                    <div className='flex items-center justify-between w-100 m-5'>
+                        <h1 className='text-2xl font-bold mb-4'>Ad Campaigns</h1>
+                        <button onClick={() => setOpen(true)} className='bg-blue-600 text-white px-3 py-1 rounded'>
+                            Add campaign
+                        </button>
+                    </div>
 
-                <div className='flex justify-between items-center'>
-                    <h2 className='text-xl font-semibold'>Campaigns</h2>
-                    <button
-                        onClick={() => setShowIdFirst((prev) => !prev)}
-                        className='text-sm bg-gray-200 px-3 py-1 rounded'
-                    >
-                        Toggle Column Order
-                    </button>
-                </div>
+                    <div>
+                        <button
+                            onClick={() => setShowIdFirst((prev) => !prev)}
+                            className='text-sm bg-gray-200 px-3 py-1 my-3 rounded'
+                        >
+                            Toggle Column Order
+                        </button>
+                    </div>
 
-                <table className='min-w-full border border-gray-300 text-sm'>
-                    <thead className='bg-gray-100'>
-                        <tr>
-                            {headers.map((header) => (
-                                <th key={header} className='p-2 border'>
-                                    {header}
-                                </th>
-                            ))}
-                            <th className='p-2 border'>Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {campaigns.map((campaign) => (
-                            <tr
-                                key={campaign.id}
-                                className='border-t hover:bg-gray-50 cursor-pointer'
-                                onClick={() => navigate(`/campaign/${campaign.id}`)}
-                            >
-                                <td className='p-2 border'>{(campaign as any)[accessors[0]]}</td>
-                                <td className='p-2 border'>{(campaign as any)[accessors[1]]}</td>
-                                <td className='p-2 border space-x-2'>
-                                    <button className='text-blue-600 hover:underline text-sm'>Edit</button>
-
-                                    <Form method='post' className='inline'>
-                                        <input type='hidden' name='_action' value='deleteCampaign' />
-                                        <input type='hidden' name='campaign_id' value={campaign.id} />
-                                        <button type='submit' className='text-red-600 hover:underline text-sm'>
-                                            Delete
-                                        </button>
-                                    </Form>
-                                </td>
+                    <table className='border border-gray-300 text-sm '>
+                        <thead className='bg-gray-100'>
+                            <tr>
+                                {headers.map((header) => (
+                                    <th key={header} className='p-2 border'>
+                                        {header}
+                                    </th>
+                                ))}
+                                <th className='p-2 border'>Actions</th>
                             </tr>
-                        ))}
-                    </tbody>
-                </table>
+                        </thead>
+                        <tbody>
+                            {campaigns.map((campaign) => (
+                                <tr
+                                    key={campaign.id}
+                                    className='border-t hover:bg-gray-50 cursor-pointer'
+                                    onClick={() => navigate(`/campaign/${campaign.id}`)}
+                                >
+                                    <td className='p-2 border text-center'>{(campaign as any)[accessors[0]]}</td>
+                                    <td className='p-2 border text-center'>{(campaign as any)[accessors[1]]}</td>
+                                    <td className='p-2 border text-center space-x-2'>
+                                        <button className='text-blue-600 hover:underline text-sm'>Edit</button>
+
+                                        <Form method='post' className='inline'>
+                                            <input type='hidden' name='_action' value='deleteCampaign' />
+                                            <input type='hidden' name='campaign_id' value={campaign.id} />
+                                            <button type='submit' className='text-red-600 hover:underline text-sm'>
+                                                Delete
+                                            </button>
+                                        </Form>
+                                    </td>
+                                </tr>
+                            ))}
+                        </tbody>
+                    </table>
+                </div>
             </div>
         </>
     );
