@@ -59,7 +59,7 @@ export default function CampaignDetailsPage() {
                             </button>
                         </div>
 
-                        <Form method='post' className='space-y-3'>
+                        <Form method='post' className='space-y-3' onSubmit={() => setOpen(false)}>
                             <input type='hidden' name='_action' value='addKeyword' />
                             <input type='hidden' name='campaign_id' value={campaignDetails.id} />
 

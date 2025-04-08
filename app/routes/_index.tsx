@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { LoaderFunction, ActionFunction } from '@remix-run/node';
-import { useLoaderData, Link, redirect, Form } from '@remix-run/react';
+import { useLoaderData, redirect, Form, useNavigate } from '@remix-run/react';
 import { Campaign, getCampaigns, addCampaign, deleteCampaign } from '../lib/data.server';
 
 export const loader: LoaderFunction = async () => {
@@ -31,12 +31,12 @@ export const action: ActionFunction = async ({ request }) => {
 export default function Index() {
     const [open, setOpen] = useState(false);
     const [showIdFirst, setShowIdFirst] = useState(true);
+    const navigate = useNavigate();
 
     const headers = showIdFirst ? ['ID', 'Name'] : ['Name', 'ID'];
     const accessors = showIdFirst ? ['id', 'name'] : ['name', 'id'];
 
     const campaigns: Campaign[] = useLoaderData();
-    console.log(campaigns);
 
     return (
         <>
@@ -118,7 +118,11 @@ export default function Index() {
                     </thead>
                     <tbody>
                         {campaigns.map((campaign) => (
-                            <tr key={campaign.id} className='border-t hover:bg-gray-50'>
+                            <tr
+                                key={campaign.id}
+                                className='border-t hover:bg-gray-50 cursor-pointer'
+                                onClick={() => navigate(`/campaign/${campaign.id}`)}
+                            >
                                 <td className='p-2 border'>{(campaign as any)[accessors[0]]}</td>
                                 <td className='p-2 border'>{(campaign as any)[accessors[1]]}</td>
                                 <td className='p-2 border space-x-2'>
