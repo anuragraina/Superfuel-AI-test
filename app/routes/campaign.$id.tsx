@@ -128,7 +128,10 @@ export default function CampaignDetailsPage() {
             <div className='flex h-screen items-center justify-center w-screen'>
                 <div className='flex flex-col border-black w-1/2'>
                     <div className='flex items-center justify-between'>
-                        <h1 className='text-2xl font-bold mb-4'>{`${campaignDetails.name} - Keywords`}</h1>
+                        <div>
+                            <h1 className='text-2xl font-bold mb-4'>{campaignDetails.name}</h1>
+                            <p className='font-bold mb-4'>{`Daily Budget: ${campaignDetails.daily_budget}`}</p>
+                        </div>
                         <button onClick={() => setOpen(true)} className='bg-blue-600 text-white px-3 py-1 rounded'>
                             Add keyword
                         </button>
@@ -152,6 +155,9 @@ export default function CampaignDetailsPage() {
                                                 {header}
                                             </th>
                                         ))}
+                                        <th className='p-2 border'>Bid Amount</th>
+                                        <th className='p-2 border'>Match Type</th>
+                                        <th className='p-2 border'>State</th>
                                         <th className='p-2 border'>Actions</th>
                                     </tr>
                                 </thead>
@@ -160,6 +166,9 @@ export default function CampaignDetailsPage() {
                                         <tr key={keyword.id} className='border-t hover:bg-gray-50'>
                                             <td className='p-2 border text-center'>{(keyword as any)[accessors[0]]}</td>
                                             <td className='p-2 border text-center'>{(keyword as any)[accessors[1]]}</td>
+                                            <td className='p-2 border text-center'>{keyword.bid}</td>
+                                            <td className='p-2 border text-center'>{keyword.match_type}</td>
+                                            <td className='p-2 border text-center'>{keyword.state}</td>
                                             <td className='p-2 border space-x-2 text-center'>
                                                 <Form method='post' className='inline'>
                                                     <input type='hidden' name='_action' value='deleteKeyword' />
