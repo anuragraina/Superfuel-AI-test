@@ -30,6 +30,11 @@ export const action: ActionFunction = async ({ request }) => {
 
 export default function Index() {
     const [open, setOpen] = useState(false);
+    const [showIdFirst, setShowIdFirst] = useState(true);
+
+    const headers = showIdFirst ? ['ID', 'Name'] : ['Name', 'ID'];
+    const accessors = showIdFirst ? ['id', 'name'] : ['name', 'id'];
+
     const campaigns: Campaign[] = useLoaderData();
     console.log(campaigns);
 
@@ -89,28 +94,48 @@ export default function Index() {
                         Add campaign
                     </button>
                 </div>
-                {campaigns.map((campaign) => (
-                    <div key={campaign.id} className='border p-4 rounded flex justify-between items-center'>
-                        <div>
-                            <Link to={`/campaign/${campaign.id}`}>
-                                <h2 className='text-xl font-semibold'>{campaign.name}</h2>
-                                <p>Daily Budget: ${campaign.daily_budget}</p>
-                            </Link>
-                        </div>
-                        <Form method='POST'>
-                            <input type='hidden' name='_action' value='editCampaign' />
-                            <input type='hidden' name='campaign_id' value={campaign.id} />
-                            <button type='submit' value={campaign.id}>
-                                Edit
-                            </button>
-                        </Form>
-                        <Form method='POST'>
-                            <input type='hidden' name='_action' value='deleteCampaign' />
-                            <input type='hidden' name='campaign_id' value={campaign.id} />
-                            <button type='submit'>Delete</button>
-                        </Form>
-                    </div>
-                ))}
+
+                <div className='flex justify-between items-center'>
+                    <h2 className='text-xl font-semibold'>Campaigns</h2>
+                    <button
+                        onClick={() => setShowIdFirst((prev) => !prev)}
+                        className='text-sm bg-gray-200 px-3 py-1 rounded'
+                    >
+                        Toggle Column Order
+                    </button>
+                </div>
+
+                <table className='min-w-full border border-gray-300 text-sm'>
+                    <thead className='bg-gray-100'>
+                        <tr>
+                            {headers.map((header) => (
+                                <th key={header} className='p-2 border'>
+                                    {header}
+                                </th>
+                            ))}
+                            <th className='p-2 border'>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {campaigns.map((campaign) => (
+                            <tr key={campaign.id} className='border-t hover:bg-gray-50'>
+                                <td className='p-2 border'>{(campaign as any)[accessors[0]]}</td>
+                                <td className='p-2 border'>{(campaign as any)[accessors[1]]}</td>
+                                <td className='p-2 border space-x-2'>
+                                    <button className='text-blue-600 hover:underline text-sm'>Edit</button>
+
+                                    <Form method='post' className='inline'>
+                                        <input type='hidden' name='_action' value='deleteCampaign' />
+                                        <input type='hidden' name='campaign_id' value={campaign.id} />
+                                        <button type='submit' className='text-red-600 hover:underline text-sm'>
+                                            Delete
+                                        </button>
+                                    </Form>
+                                </td>
+                            </tr>
+                        ))}
+                    </tbody>
+                </table>
             </div>
         </>
     );
